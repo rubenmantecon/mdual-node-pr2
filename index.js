@@ -22,13 +22,7 @@ app.post('/', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-	res.send('Register, my dude\
-	<form method="post">\
-	<input type="text" name="usuari"> <br>\
-	<input type="password" name="pass"><br>\
-	<input type="submit">\
-	</form>\
-	');
+	res.render('register.ejs', {});
 });
 
 app.post('/register', (req, res) => {
