@@ -5,13 +5,13 @@ const app = express();
 const port = 3000;
 
 app.use(bodyParser.urlencoded({ extended: false }));
-app.set('view engine', 'ejs')
+app.set('view engine', 'ejs');
 
 if (typeof localStorage === "undefined" || localStorage === null) {
-  var LocalStorage = require('node-localstorage').LocalStorage;
-  localStorage = new LocalStorage('./scratch');
+	var LocalStorage = require('node-localstorage').LocalStorage;
+	localStorage = new LocalStorage('./scratch');
 }
- 
+
 app.get('/', (req, res) => {
 	res.render('main', {});
 });
@@ -28,12 +28,14 @@ app.get('/register', (req, res) => {
 app.post('/register', (req, res) => {
 	let usuari = req.body.usuari;
 	let contrasenya = req.body.pass;
+	let token = '';
+	let dades = {password: contrasenya, token: token}
 
-	if ((!usuari || ! contrasenya)) {
-		res.send("KO");
+	if ((!usuari || !contrasenya)) {
+		res.json("KO, something's wrong, please try again.");
 	} else {
-		localStorage.setItem(usuari, contrasenya);
-		res.send("<h1>OK<h1>")
+		localStorage.setItem(usuari, JSON.stringify(dades));
+		res.json("OK, you are in.");
 	}
 });
 
@@ -49,13 +51,27 @@ app.get('/login', (req, res) => {
 app.post('/login', (req, res) => {
 	let usuari = req.body.usuari;
 	let contrasenya = req.body.pass;
-	let contrasenya2 = localStorage.getItem(usuari)
-
-	if ((!usuari || ! contrasenya) || (contrasenya !== contrasenya2) ) {
-		res.send("KO"); 
+	let dadesUsuari = JSON.parse(localStorage.getItem(usuari));
+	if (dadesUsuari == null){
+		res.json("KO");
 	} else {
-			res.send("OK")
+		contraGuardada = dadesUsuari.password
+		if ((!usuari || !contrasenya) || (contrasenya !== contraGuardada)) {
+			res.json("KO");
+		} else {
+			let token = 'aguacate';
+			res.json({status: "OK", token: token});
+		}
 	}
+
+});
+
+app.get("/api/login", (req, res) => {
+	//
+});
+
+app.post("/api/login", (req, res) => {
+	//
 });
 
 app.listen(port, () => {
